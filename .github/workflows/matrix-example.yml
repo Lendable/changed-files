@@ -9,10 +9,14 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   changed-files:
     name: Get changed files
-    runs-on: [ 'lendable-small-arm64-linux' ]
+    runs-on: [ 'ubuntu-latest' ]
     outputs:
       matrix: ${{ steps.changed-files.outputs.all_changed_files }}
     steps:
@@ -30,7 +34,7 @@ jobs:
 
   matrix-job:
     name: Run Matrix Job
-    runs-on: [ 'lendable-small-arm64-linux' ]
+    runs-on: [ 'ubuntu-latest' ]
     needs: [changed-files]
     strategy:
       matrix: 

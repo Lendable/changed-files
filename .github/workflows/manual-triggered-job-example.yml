@@ -6,10 +6,15 @@ permissions:
 on:
   workflow_dispatch:
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test changed-files
-    runs-on: [ 'lendable-small-arm64-linux' ]
+    runs-on: [ 'ubuntu-latest' ]
 
     steps:
       - name: Checkout
