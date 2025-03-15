@@ -2,7 +2,7 @@
   "name": "@step-security/changed-files",
   "version": "45.0.7",
   "description": "Github action to retrieve all (added, copied, modified, deleted, renamed, type changed, unmerged, unknown) files and directories.",
-  "main": "lib/main.js",
+  "main": "dist/main.js",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
@@ -15,7 +15,8 @@
     "package": "ncc build lib/main.js --source-map --license licenses.txt",
     "test": "jest --coverage",
     "update-snapshot": "jest -u",
-    "all": "yarn build && yarn format && yarn lint && yarn package && yarn test"
+    "all": "yarn build && yarn format && yarn lint && yarn package && yarn test",
+    "pack": "esbuild src/main.ts --outdir=dist --platform=node --bundle"
   },
   "repository": {
     "type": "git",
