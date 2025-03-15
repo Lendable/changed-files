@@ -9,12 +9,7 @@ on:
 jobs:
   test:
     name: Test changed-files
-    runs-on: ${{ matrix.platform }}
-    strategy:
-      fail-fast: false
-      max-parallel: 7
-      matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: [ 'lendable-small-arm64-linux' ]
 
     steps:
       - name: Checkout
