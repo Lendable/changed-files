@@ -285,6 +285,28 @@ export const submoduleExists = async ({
 }
 
 /**
+ * Checks if a string is safe to use as a git argument (prevents option injection)
+ * @param val - the argument to check
+ * @returns true if safe, false otherwise
+ */
+export function isSafeGitArg(val: string): boolean {
+  // Disallow args that start with dash, are empty, or obviously suspicious
+  if (!val || typeof val !== 'string') return false
+  if (val.startsWith('-')) return false
+  // Disallow sequences forbidden in git refs: spaces, control chars, "..", ".lock", etc.
+  if (/[ \t\n\r]/.test(val)) return false
+  if (val.includes('..')) return false
+  if (val.endsWith('.lock')) return false
+  if (val.includes('@{')) return false
+  if (val.includes('\\')) return false
+  if (val.startsWith('/')) return false
+  if (val.endsWith('/')) return false
+  if (val.includes('//')) return false
+  if (val.match(/[\x00-\x1F\x7F]/)) return false
+  return true
+}
+
+/**
  * Fetches the git repository
  * @param args - arguments for fetch command
  * @param cwd - working directory

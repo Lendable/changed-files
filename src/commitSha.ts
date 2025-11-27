@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 
 import {Env} from './env'
 import {Inputs} from './inputs'
+import { isSafeGitArg } from './utils'
 import {
   canDiffCommits,
   cleanShaInput,
@@ -343,6 +344,31 @@ export const getSHAForPullRequestEvent = async ({
 }: SHAForPullRequestEvent): Promise<DiffResult> => {
   let targetBranch = github.context.payload.pull_request?.base?.ref
   const currentBranch = github.context.payload.pull_request?.head?.ref
+
+  // Validate branch/ref names and any gitFetchExtraArgs that may be tainted
+  import { isSafeGitArg } from './utils'
+  const argListToValidate = [
+    ...(Array.isArray(gitFetchExtraArgs) ? gitFetchExtraArgs : []),
+    remoteName
+  ]
+  if (currentBranch && !isSafeGitArg(currentBranch)) {
+    throw new Error(
+      `Unsafe branch name detected in PR head.ref: "${currentBranch}". Possible injection attempt.`
+    )
+  }
+  if (targetBranch && !isSafeGitArg(targetBranch)) {
+    throw new Error(
+      `Unsafe branch name detected in PR base.ref: "${targetBranch}". Possible injection attempt.`
+    )
+  }
+  for (const a of argListToValidate) {
+    if (!isSafeGitArg(a)) {
+      throw new Error(
+        `Unsafe extra git argument detected: "${a}". Possible injection attempt.`
+      )
+    }
+  }
+
   if (inputs.sinceLastRemoteCommit) {
     targetBranch = currentBranch
   }
